@@ -18,16 +18,44 @@ public class Scanner {
 
     private String dssatproPath = null;
     private int version = 46;
-    
+
+    /**
+     * Construct the scanner object with given DSSATPRO file path.
+     *
+     * @param dssatproPath DSSATPRO file path
+     */
     public Scanner(String dssatproPath) {
         this.dssatproPath = dssatproPath;
         this.version = Integer.parseInt(dssatproPath.replaceAll(".+\\.v", ""));
     }
 
+    /**
+     * Scan the given crop under given model, and output the report in the
+     * default path.
+     *
+     * @param crid 2-bit crop ID
+     * @param model 3-bit model ID
+     * @return output report file
+     * @throws FileNotFoundException
+     * @throws IOException
+     * @throws Exception
+     */
     public File scan(String crid, String model) throws FileNotFoundException, IOException, Exception {
         return scan(crid, model, "");
     }
 
+    /**
+     * Scan the given crop under given model, and output the report in the given
+     * path.
+     *
+     * @param crid 2-bit crop ID
+     * @param model 3-bit model ID
+     * @param outputPath path for report file
+     * @return output report file
+     * @throws FileNotFoundException
+     * @throws IOException
+     * @throws Exception
+     */
     public File scan(String crid, String model, String outputPath) throws FileNotFoundException, IOException, Exception {
         File output = revisePath(outputPath);
         File culPath = getCulPath();
@@ -39,11 +67,31 @@ public class Scanner {
 
         return output;
     }
-    
+
+
+    /**
+     * Scan all the *.cul files in the genotype folder, and output the report in
+     * the default path.
+     *
+     * @return output report file
+     * @throws FileNotFoundException
+     * @throws IOException
+     * @throws Exception
+     */
     public File scanAll() throws FileNotFoundException, IOException, Exception {
         return scanAll("");
     }
-    
+
+    /**
+     * Scan all the *.cul files in the genotype folder, and output the report in
+     * the given path.
+     *
+     * @param outputPath path for report file
+     * @return output report file
+     * @throws FileNotFoundException
+     * @throws IOException
+     * @throws Exception
+     */
     public File scanAll(String outputPath) throws FileNotFoundException, IOException, Exception {
         File output = revisePath(outputPath);
         File culPath = getCulPath();
@@ -51,14 +99,12 @@ public class Scanner {
         BufferedWriter bw = new BufferedWriter(new FileWriter(output));
         for (File culFile : culFiles) {
             bw.append(readCulInfo(culFile));
-//            System.out.println(readCulInfo(culFile));
-            
         }
         bw.flush();
         bw.close();
         return output;
     }
-    
+
     private File revisePath(String path) {
         Calendar cal = Calendar.getInstance();
         String defFileName = "report_" + cal.getTimeInMillis() + ".txt";
@@ -77,7 +123,7 @@ public class Scanner {
         }
         return output;
     }
-    
+
     private File getCulPath() throws FileNotFoundException, IOException, Exception {
         String culPath = null;
         BufferedReader br = new BufferedReader(new FileReader(new File(dssatproPath)));
@@ -99,7 +145,7 @@ public class Scanner {
             throw new Exception("Could not find genotype path in DSSATPRO");
         }
     }
-    
+
     private File getCulFile(File culPath, String crid, String model) throws Exception {
         String culFileName = String.format("%s%s%03d.CUL", crid, model, version);
         File culFile = new File(culPath.getPath() + File.separator + culFileName);
@@ -109,7 +155,7 @@ public class Scanner {
             return culFile;
         }
     }
-    
+
     private ArrayList<File> getCulFiles(File culPath) throws Exception {
         ArrayList<File> culFiles = new ArrayList();
         for (File file : culPath.listFiles()) {
@@ -119,7 +165,7 @@ public class Scanner {
         }
         return culFiles;
     }
-    
+
     private String readCulInfo(File culFile) throws FileNotFoundException, IOException {
         BufferedReader br = new BufferedReader(new FileReader(culFile));
         StringBuilder sb = new StringBuilder();
